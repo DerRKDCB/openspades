@@ -26,6 +26,8 @@ namespace spades {
         private array<spades::ui::CommandHistoryItem @> history = {};
         private FieldWithHistory @field;
         private spades::ui::TextViewer @viewer;
+        private spades::ui::Label @topLabel;
+        private spades::ui::Label @bottomLabel;
 
         private ConfigItem cl_consoleScrollbackLines("cl_consoleScrollbackLines", "1000");
 
@@ -42,6 +44,7 @@ namespace spades {
                 label.BackgroundColor = Vector4(0, 0, 0, 0.8f);
                 label.Bounds = AABB2(0.f, 0.f, Manager.Renderer.ScreenWidth, height);
                 AddChild(label);
+                @topLabel = label;
             }
             {
                 spades::ui::Label label(Manager);
@@ -49,6 +52,7 @@ namespace spades {
                 label.Bounds = AABB2(0.f, height, Manager.Renderer.ScreenWidth,
                                      Manager.Renderer.ScreenHeight - height);
                 AddChild(label);
+                @bottomLabel = label;
             }
 
             {
@@ -65,6 +69,18 @@ namespace spades {
                 viewer.MaxNumLines = uint(cl_consoleScrollbackLines.IntValue);
                 @this.viewer = viewer;
             }
+        }
+
+        void OnScreenSizeChanged() {
+            Vector2 size = Manager.RootElement.Size;
+            Position = Vector2(0.f, 0.f);
+            Size = size;
+
+            float height = floor(size.y * 0.4f);
+            topLabel.Bounds = AABB2(0.f, 0.f, size.x, height);
+            bottomLabel.Bounds = AABB2(0.f, height, size.x, size.y - height);
+            field.Bounds = AABB2(10.f, height - 35.f, size.x - 20.f, 30.f);
+            viewer.Bounds = AABB2(10.f, 5.f, size.x - 20.f, height - 45.f);
         }
 
         private void OnFieldChanged(spades::ui::UIElement @sender) {}

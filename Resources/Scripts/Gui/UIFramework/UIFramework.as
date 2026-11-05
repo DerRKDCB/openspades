@@ -329,7 +329,30 @@ namespace spades {
                 }
             }
 
+            private void NotifyScreenSizeChanged(UIElement @element) {
+                element.OnScreenSizeChanged();
+
+                UIElement @child = element.FirstChild;
+                while (child !is null) {
+                    NotifyScreenSizeChanged(child);
+                    @child = child.NextSibling;
+                }
+            }
+
+            private void UpdateScreenSize() {
+                Vector2 size = Vector2(renderer.ScreenWidth, renderer.ScreenHeight);
+                if (RootElement.Size.x != size.x or RootElement.Size.y != size.y) {
+                    RootElement.Size = size;
+                    MouseCursorPosition =
+                        Vector2(Clamp(MouseCursorPosition.x, 0.f, size.x),
+                                Clamp(MouseCursorPosition.y, 0.f, size.y));
+                    NotifyScreenSizeChanged(RootElement);
+                }
+            }
+
             void RunFrame(float dt) {
+                UpdateScreenSize();
+
                 if (ActiveElement !is null) {
                     if (not(ActiveElement.IsVisible and ActiveElement.IsEnabled)) {
                         @ActiveElement = null;
@@ -772,6 +795,9 @@ namespace spades {
             }
 
             void OnResized() {}
+
+            /** Called when the window (and therefore the UI root) changed its size. */
+            void OnScreenSizeChanged() { OnResized(); }
 
             // relativePos is parent relative
             UIElement @MouseHitTest(Vector2 relativePos) final {

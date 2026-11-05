@@ -121,7 +121,6 @@ namespace spades {
 		SDLGLDevice::SDLGLDevice(SDL_Window *s) : window(s) {
 			SPLog("starting SDLGLDevice");
 
-			SDL_GetWindowSize(window, &w, &h);
 			context = SDL_GL_CreateContext(s);
 			if (!context) {
 				const char *err = SDL_GetError();
@@ -2077,8 +2076,16 @@ namespace spades {
 			CheckErrorAlways();
 		}
 
-		IGLDevice::Integer SDLGLDevice::ScreenWidth() { return w; }
+		IGLDevice::Integer SDLGLDevice::ScreenWidth() {
+			int w = 0, h = 0;
+			SDL_GetWindowSize(window, &w, &h);
+			return w;
+		}
 
-		IGLDevice::Integer SDLGLDevice::ScreenHeight() { return h; }
+		IGLDevice::Integer SDLGLDevice::ScreenHeight() {
+			int w = 0, h = 0;
+			SDL_GetWindowSize(window, &w, &h);
+			return h;
+		}
 	}
 }

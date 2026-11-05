@@ -452,7 +452,7 @@ namespace spades {
 
 				switch (rtype) {
 					case RendererType::GL:
-						sdlFlags = SDL_WINDOW_OPENGL;
+						sdlFlags = SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE;
 						SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 						SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 0);
 						if (!r_allowSoftwareRendering)
@@ -486,6 +486,9 @@ namespace spades {
 					std::string msg = SDL_GetError();
 					SPRaise("Failed to create graphics window: %s", msg.c_str());
 				}
+
+				if (rtype == RendererType::GL)
+					SDL_SetWindowMinimumSize(window, 320, 240);
 
 #ifdef __APPLE__
 #elif __unix

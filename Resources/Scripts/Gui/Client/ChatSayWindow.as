@@ -143,8 +143,10 @@ namespace spades {
 
         CommandField @field;
         spades::ui::Button @sayButton;
+        spades::ui::Button @cancelButton;
         spades::ui::SimpleButton @teamButton;
         spades::ui::SimpleButton @globalButton;
+        private spades::ui::Label @backgroundLabel;
 
         bool isTeamChat;
 
@@ -170,6 +172,7 @@ namespace spades {
                 label.BackgroundColor = Vector4(0, 0, 0, 0.5f);
                 label.Bounds = AABB2(winX - 8.f, winY - 8.f, winW + 16.f, winH + 16.f);
                 AddChild(label);
+                @backgroundLabel = label;
             }
             {
                 spades::ui::Button button(Manager);
@@ -185,6 +188,7 @@ namespace spades {
                 button.Bounds = AABB2(winX + winW - 120.f, winY + 36.f, 120.f, 30.f);
                 @button.Activated = spades::ui::EventHandler(this.OnCancel);
                 AddChild(button);
+                @cancelButton = button;
             }
             {
                 @field = CommandField(Manager, ui.chatHistory);
@@ -211,6 +215,23 @@ namespace spades {
                 @teamButton.Activated = spades::ui::EventHandler(this.OnSetTeam);
                 AddChild(teamButton);
             }
+        }
+
+        void OnScreenSizeChanged() {
+            Vector2 size = Manager.RootElement.Size;
+            Position = Vector2(0.f, 0.f);
+            Size = size;
+
+            float winW = size.x * 0.7f, winH = 66.f;
+            float winX = (size.x - winW) * 0.5f;
+            float winY = (size.y - winH) - 20.f;
+
+            backgroundLabel.Bounds = AABB2(winX - 8.f, winY - 8.f, winW + 16.f, winH + 16.f);
+            sayButton.Bounds = AABB2(winX + winW - 244.f, winY + 36.f, 120.f, 30.f);
+            cancelButton.Bounds = AABB2(winX + winW - 120.f, winY + 36.f, 120.f, 30.f);
+            field.Bounds = AABB2(winX, winY, winW, 30.f);
+            globalButton.Bounds = AABB2(winX, winY + 36.f, 70.f, 30.f);
+            teamButton.Bounds = AABB2(winX + 70.f, winY + 36.f, 70.f, 30.f);
         }
 
         void UpdateState() { sayButton.Enable = field.Text.length > 0; }

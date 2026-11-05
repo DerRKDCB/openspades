@@ -94,6 +94,9 @@ namespace spades {
 			device.EnableVertexAttribArray((*colorAttribute)(), true);
 			device.EnableVertexAttribArray((*textureCoordAttribute)(), true);
 
+			// The window may have been resized since the last flush.
+			invScreenWidthFactored = 2.f / device.ScreenWidth();
+			invScreenHeightFactored = -2.f / device.ScreenHeight();
 			screenSize->SetValue(invScreenWidthFactored, invScreenHeightFactored);
 			textureSize->SetValue(image->GetInvWidth(), image->GetInvHeight());
 			texture->SetValue(0);

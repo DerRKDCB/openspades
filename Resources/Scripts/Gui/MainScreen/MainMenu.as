@@ -78,6 +78,8 @@ namespace spades {
         MainScreenServerListErrorView @errorView;
         bool loading = false, loaded = false;
 
+        private float lastScreenWidth, lastScreenHeight;
+
         private ConfigItem cg_protocolVersion("cg_protocolVersion", "3");
         private ConfigItem cg_lastQuickConnectHost("cg_lastQuickConnectHost", "127.0.0.1");
         private ConfigItem cg_serverlistSort("cg_serverlistSort", "16385");
@@ -260,6 +262,38 @@ namespace spades {
                 AddChild(errorView);
             }
             LoadServerList();
+
+            lastScreenWidth = Manager.Renderer.ScreenWidth;
+            lastScreenHeight = Manager.Renderer.ScreenHeight;
+        }
+
+        void OnScreenSizeChanged() {
+            Vector2 size = Manager.RootElement.Size;
+            float dx = (size.x - lastScreenWidth) * 0.5f;
+            float dy = size.y - lastScreenHeight;
+
+            Position = Vector2(0.f, 0.f);
+            Size = size;
+
+            spades::ui::UIElement @child = FirstChild;
+            while (child !is null) {
+                child.Position.x += dx;
+
+                if (child is serverList) {
+                    // The server list fills the space between the column headers
+                    // and the footer.
+                    child.Size.y = Max(1.f, size.y - 330.f);
+                } else if (child.Position.y > lastScreenHeight - 51.f and
+                           child.Position.y < lastScreenHeight - 49.f) {
+                    // Footer controls are anchored to the bottom edge.
+                    child.Position.y += dy;
+                }
+
+                @child = child.NextSibling;
+            }
+
+            lastScreenWidth = size.x;
+            lastScreenHeight = size.y;
         }
 
         void LoadServerList() {

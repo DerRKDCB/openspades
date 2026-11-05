@@ -100,6 +100,7 @@ namespace spades {
             @activeUI = value;
             if (activeUI !is null) {
                 activeUI.Bounds = manager.RootElement.Bounds;
+                activeUI.OnScreenSizeChanged();
                 manager.RootElement.AddChild(activeUI);
             }
             manager.KeyPanic();

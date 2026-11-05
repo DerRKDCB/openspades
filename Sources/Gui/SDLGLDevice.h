@@ -30,7 +30,6 @@ namespace spades {
 		class SDLGLDevice : public draw::IGLDevice {
 			SDL_Window *window;
 			SDL_GLContext context;
-			int w, h;
 
 		protected:
 			~SDLGLDevice();

@@ -28,6 +28,9 @@ namespace spades {
         private spades::ui::UIElement @owner;
 
         private PreferenceTab @[] tabs;
+        private spades::ui::Label @backgroundLabel;
+        private spades::ui::Label @panelLabel;
+        private PreferenceTabButton @backButton;
         float ContentsLeft, ContentsWidth;
         float ContentsTop, ContentsHeight;
 
@@ -50,12 +53,14 @@ namespace spades {
                 label.BackgroundColor = Vector4(0, 0, 0, 0.4f);
                 label.Bounds = Bounds;
                 AddChild(label);
+                @backgroundLabel = label;
             }
             {
                 spades::ui::Label label(Manager);
                 label.BackgroundColor = Vector4(0, 0, 0, 0.8f);
                 label.Bounds = AABB2(0.f, ContentsTop - 13.f, Size.x, ContentsHeight + 27.f);
                 AddChild(label);
+                @panelLabel = label;
             }
 
             AddTab(GameOptionsPanel(Manager, options, fontManager),
@@ -73,9 +78,36 @@ namespace spades {
                 button.Alignment = Vector2(0.f, 0.5f);
                 @button.Activated = spades::ui::EventHandler(this.OnClosePressed);
                 AddChild(button);
+                @backButton = button;
             }
 
             UpdateTabs();
+        }
+
+        void OnScreenSizeChanged() {
+            Vector2 size = Manager.RootElement.Size;
+            Position = Vector2(0.f, 0.f);
+            Size = size;
+
+            ContentsLeft = (size.x - ContentsWidth) * 0.5f;
+            ContentsTop = (size.y - ContentsHeight) * 0.5f;
+
+            backgroundLabel.Bounds = AABB2(0.f, 0.f, size.x, size.y);
+            panelLabel.Bounds =
+                AABB2(0.f, ContentsTop - 13.f, size.x, ContentsHeight + 27.f);
+
+            for (uint i = 0; i < tabs.length; i++) {
+                PreferenceTab @tab = tabs[i];
+                tab.TabButton.Bounds =
+                    AABB2(ContentsLeft + 10.f, ContentsTop + 10.f + float(i) * 32.f, 150.f, 30.f);
+                tab.View.Bounds =
+                    AABB2(ContentsLeft + 170.f, ContentsTop + 10.f, ContentsWidth - 180.f,
+                          ContentsHeight - 20.f);
+            }
+
+            backButton.Bounds =
+                AABB2(ContentsLeft + 10.f, ContentsTop + 10.f + float(tabs.length) * 32.f + 5.f,
+                      150.f, 30.f);
         }
 
         private void AddTab(spades::ui::UIElement @view, string caption) {

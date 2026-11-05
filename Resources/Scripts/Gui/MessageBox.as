@@ -28,6 +28,11 @@ namespace spades {
 
         private spades::ui::UIElement @owner;
 
+        private spades::ui::Label @backgroundLabel;
+        private spades::ui::Label @panelLabel;
+        private spades::ui::UIElement @[] dialogButtons = {};
+        private spades::ui::TextViewer @viewer;
+
         MessageBoxScreen(spades::ui::UIElement @owner, string text, string[] @buttons,
                          float height = 200.f) {
             super(owner.Manager);
@@ -44,12 +49,14 @@ namespace spades {
                 label.BackgroundColor = Vector4(0, 0, 0, 0.4f);
                 label.Bounds = Bounds;
                 AddChild(label);
+                @backgroundLabel = label;
             }
             {
                 spades::ui::Label label(Manager);
                 label.BackgroundColor = Vector4(0, 0, 0, 0.8f);
                 label.Bounds = AABB2(0.f, contentsTop - 13.f, Size.x, contentsHeight + 27.f);
                 AddChild(label);
+                @panelLabel = label;
             }
             for (uint i = 0; i < buttons.length; ++i) {
                 spades::ui::Button button(Manager);
@@ -63,6 +70,7 @@ namespace spades {
                 handler.resultIndex = int(i);
                 @button.Activated = spades::ui::EventHandler(handler.OnPressed);
                 AddChild(button);
+                dialogButtons.insertLast(button);
             }
             {
                 spades::ui::TextViewer viewer(Manager);
@@ -70,7 +78,30 @@ namespace spades {
                 viewer.Bounds =
                     AABB2(contentsLeft, contentsTop, contentsWidth, contentsHeight - 40.f);
                 viewer.Text = text;
+                @this.viewer = viewer;
             }
+        }
+
+        void OnScreenSizeChanged() {
+            Vector2 size = Manager.RootElement.Size;
+            Position = Vector2(0.f, 0.f);
+            Size = size;
+
+            float contentsWidth = 700.f;
+            float contentsLeft = (size.x - contentsWidth) * 0.5f;
+            contentsTop = (size.y - contentsHeight) * 0.5f;
+
+            backgroundLabel.Bounds = AABB2(0.f, 0.f, size.x, size.y);
+            panelLabel.Bounds = AABB2(0.f, contentsTop - 13.f, size.x, contentsHeight + 27.f);
+
+            for (uint i = 0; i < dialogButtons.length; ++i) {
+                dialogButtons[i].Bounds =
+                    AABB2(contentsLeft + contentsWidth -
+                              (150.f + 10.f) * (dialogButtons.length - i) + 10.f,
+                          contentsTop + contentsHeight - 30.f, 150.f, 30.f);
+            }
+            viewer.Bounds =
+                AABB2(contentsLeft, contentsTop, contentsWidth, contentsHeight - 40.f);
         }
 
         private void OnClosed() {

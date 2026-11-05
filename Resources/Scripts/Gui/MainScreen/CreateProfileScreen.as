@@ -27,6 +27,12 @@ namespace spades {
         private spades::ui::UIElement @owner;
         private spades::ui::Field @nameField;
         private spades::ui::Button @okButton;
+        private spades::ui::Button @laterButton;
+        private spades::ui::Label @backgroundLabel;
+        private spades::ui::Label @panelLabel;
+        private spades::ui::Label @titleLabel;
+        private spades::ui::Label @promptLabel;
+        private spades::ui::Label @hintLabel;
 
         private ConfigItem cg_playerName("cg_playerName", "Deuce");
         private ConfigItem cg_playerNameIsSet("cg_playerNameIsSet", "0");
@@ -46,12 +52,14 @@ namespace spades {
                 label.BackgroundColor = Vector4(0, 0, 0, 0.4f);
                 label.Bounds = Bounds;
                 AddChild(label);
+                @backgroundLabel = label;
             }
             {
                 spades::ui::Label label(Manager);
                 label.BackgroundColor = Vector4(0, 0, 0, 0.8f);
                 label.Bounds = AABB2(0.f, contentsTop - 13.f, Size.x, contentsHeight + 27.f);
                 AddChild(label);
+                @panelLabel = label;
             }
             {
                 spades::ui::Button button(Manager);
@@ -70,6 +78,7 @@ namespace spades {
                     AABB2(contentsLeft, contentsTop + contentsHeight - 40.f, 140.f, 30.f);
                 @button.Activated = spades::ui::EventHandler(this.OnChooseLater);
                 AddChild(button);
+                @laterButton = button;
             }
             {
                 spades::ui::Label label(Manager);
@@ -78,6 +87,7 @@ namespace spades {
                 label.Bounds = AABB2(contentsLeft, contentsTop + 10.f, contentsWidth, 32.f);
                 label.Alignment = Vector2(0.f, 0.5f);
                 AddChild(label);
+                @titleLabel = label;
             }
             {
                 spades::ui::Label label(Manager);
@@ -85,6 +95,7 @@ namespace spades {
                 label.Bounds = AABB2(contentsLeft, contentsTop + 42.f, contentsWidth, 32.f);
                 label.Alignment = Vector2(0.f, 0.5f);
                 AddChild(label);
+                @promptLabel = label;
             }
             {
                 @nameField = spades::ui::Field(Manager);
@@ -102,7 +113,29 @@ namespace spades {
                 label.Bounds = AABB2(contentsLeft, contentsTop + 106.f, contentsWidth, 32.f);
                 label.Alignment = Vector2(0.f, 0.5f);
                 AddChild(label);
+                @hintLabel = label;
             }
+        }
+
+        void OnScreenSizeChanged() {
+            Vector2 size = Manager.RootElement.Size;
+            Position = Vector2(0.f, 0.f);
+            Size = size;
+
+            float contentsWidth = 500.f;
+            float contentsLeft = (size.x - contentsWidth) * 0.5f;
+            contentsTop = (size.y - contentsHeight) * 0.5f;
+
+            backgroundLabel.Bounds = AABB2(0.f, 0.f, size.x, size.y);
+            panelLabel.Bounds = AABB2(0.f, contentsTop - 13.f, size.x, contentsHeight + 27.f);
+            okButton.Bounds = AABB2(contentsLeft + contentsWidth - 140.f,
+                                    contentsTop + contentsHeight - 40.f, 140.f, 30.f);
+            laterButton.Bounds =
+                AABB2(contentsLeft, contentsTop + contentsHeight - 40.f, 140.f, 30.f);
+            titleLabel.Bounds = AABB2(contentsLeft, contentsTop + 10.f, contentsWidth, 32.f);
+            promptLabel.Bounds = AABB2(contentsLeft, contentsTop + 42.f, contentsWidth, 32.f);
+            nameField.Bounds = AABB2(contentsLeft, contentsTop + 74.f, contentsWidth, 30.f);
+            hintLabel.Bounds = AABB2(contentsLeft, contentsTop + 106.f, contentsWidth, 32.f);
         }
 
         private void OnClosed() {

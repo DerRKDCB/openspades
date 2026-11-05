@@ -45,6 +45,9 @@ namespace spades {
         private spades::ui::TextViewer @viewer;
         ChatLogSayWindow @sayWindow;
 
+        private spades::ui::Label @backgroundLabel;
+        private spades::ui::Label @panelLabel;
+        private spades::ui::Button @closeButton;
         private spades::ui::UIElement @sayButton1;
         private spades::ui::UIElement @sayButton2;
 
@@ -65,12 +68,14 @@ namespace spades {
                 label.BackgroundColor = Vector4(0, 0, 0, 0.4f);
                 label.Bounds = Bounds;
                 AddChild(label);
+                @backgroundLabel = label;
             }
             {
                 spades::ui::Label label(Manager);
                 label.BackgroundColor = Vector4(0, 0, 0, 0.8f);
                 label.Bounds = AABB2(0.f, contentsTop - 13.f, Size.x, contentsHeight + 27.f);
                 AddChild(label);
+                @panelLabel = label;
             }
             {
                 spades::ui::Button button(Manager);
@@ -79,6 +84,7 @@ namespace spades {
                                       contentsTop + contentsHeight - 30.f, 150.f, 30.f);
                 @button.Activated = spades::ui::EventHandler(this.OnOkPressed);
                 AddChild(button);
+                @closeButton = button;
             }
             {
                 spades::ui::Button button(Manager);
@@ -104,6 +110,32 @@ namespace spades {
                 viewer.Bounds =
                     AABB2(contentsLeft, contentsTop, contentsWidth, contentsHeight - 40.f);
                 @this.viewer = viewer;
+            }
+        }
+
+        void OnScreenSizeChanged() {
+            Vector2 size = Manager.RootElement.Size;
+            Position = Vector2(0.f, 0.f);
+            Size = size;
+
+            float contentsWidth = 700.f;
+            float contentsLeft = (size.x - contentsWidth) * 0.5f;
+            contentsHeight = size.y - 200.f;
+            contentsTop = (size.y - contentsHeight - 106.f) * 0.5f;
+
+            backgroundLabel.Bounds = AABB2(0.f, 0.f, size.x, size.y);
+            panelLabel.Bounds = AABB2(0.f, contentsTop - 13.f, size.x, contentsHeight + 27.f);
+            closeButton.Bounds = AABB2(contentsLeft + contentsWidth - 150.f,
+                                       contentsTop + contentsHeight - 30.f, 150.f, 30.f);
+            sayButton1.Bounds =
+                AABB2(contentsLeft, contentsTop + contentsHeight - 30.f, 150.f, 30.f);
+            sayButton2.Bounds =
+                AABB2(contentsLeft + 155.f, contentsTop + contentsHeight - 30.f, 150.f, 30.f);
+            viewer.Bounds =
+                AABB2(contentsLeft, contentsTop, contentsWidth, contentsHeight - 40.f);
+
+            if (sayWindow !is null) {
+                sayWindow.Bounds = this.Bounds;
             }
         }
 
